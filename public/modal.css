@@ -1,0 +1,207 @@
+/* ============================================================
+   MODAL — inherits design tokens from playlist2.css
+   ============================================================ */
+
+/* Backdrop */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 50);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: clamp(4rem, 12vh, 8rem);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: backdrop-in 200ms ease both;
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Dialog panel */
+.modal-container {
+  width: min(440px, calc(100vw - 2rem));
+  background-color: var(--color-surface, #141418);
+  border: 1px solid var(--color-border-strong, rgba(255,255,255,0.14));
+  border-radius: var(--radius-lg, 16px);
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.1),
+    0 24px 64px rgba(0,0,0,0.45);
+  overflow: hidden;
+  font-family: var(--font-body, 'Manrope', system-ui, sans-serif);
+  animation: panel-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header */
+.modal-header {
+  padding: var(--space-lg, 1.5rem) var(--space-lg, 1.5rem) 0;
+}
+
+.modal-header h3 {
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  font-size: var(--fs-h3, 1.25rem);
+  font-weight: 700;
+  color: var(--color-text, #eeeef2);
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Body */
+.modal-body {
+  padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+  color: var(--color-text-muted, #9898a8);
+  font-size: var(--fs-body, 1rem);
+  line-height: var(--lh-body, 1.6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 1rem);
+}
+
+/* Form label */
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 0.5rem);
+  font-size: var(--fs-sm, 0.875rem);
+  font-weight: 500;
+  color: var(--color-text, #eeeef2);
+}
+
+/* Text input */
+.form-control {
+  display: block;
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-md, 1rem);
+  background-color: var(--color-surface-2, #1c1c22);
+  color: var(--color-text, #eeeef2);
+  border: 1px solid var(--color-border-strong, rgba(255,255,255,0.14));
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-body, 'Manrope', system-ui, sans-serif);
+  font-size: var(--fs-body, 1rem);
+  line-height: 1;
+  outline: none;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  /* Pre-declared height prevents CLS */
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  border-color: var(--color-accent, #22d36b);
+  background-color: var(--color-accent-soft, rgba(34,211,107,0.08));
+}
+
+.form-control:focus-visible {
+  outline: 2px solid var(--color-accent, #22d36b);
+  outline-offset: 2px;
+}
+
+/* Footer */
+.modal-footer {
+  padding: var(--space-sm, 0.75rem) var(--space-lg, 1.5rem) var(--space-lg, 1.5rem);
+  border-top: 1px solid var(--color-border, rgba(255,255,255,0.07));
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs, 0.5rem);
+}
+
+.text-right {
+  justify-content: flex-end;
+}
+
+/* Action buttons */
+.modal-default-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 var(--space-md, 1rem);
+  min-width: 80px;
+  border: 1px solid var(--color-border-strong, rgba(255,255,255,0.14));
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--color-surface-2, #1c1c22);
+  color: var(--color-text, #eeeef2);
+  font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+  font-size: var(--fs-sm, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease,
+              border-color 150ms ease,
+              transform 150ms ease;
+}
+
+.modal-default-button:hover {
+  background-color: var(--color-surface-3, #26262e);
+  border-color: var(--color-accent, #22d36b);
+  color: var(--color-accent, #22d36b);
+}
+
+.modal-default-button:active {
+  transform: scale(0.97);
+}
+
+.modal-default-button:focus-visible {
+  outline: 2px solid var(--color-accent, #22d36b);
+  outline-offset: 2px;
+}
+
+/* Delete is the primary danger action — visually distinct */
+.modal-footer .modal-default-button:first-child:not(:only-child) {
+  background-color: var(--color-danger-soft, rgba(242,88,88,0.12));
+  border-color: var(--color-danger, #f25858);
+  color: var(--color-danger, #f25858);
+}
+
+.modal-footer .modal-default-button:first-child:not(:only-child):hover {
+  background-color: var(--color-danger, #f25858);
+  color: #fff;
+}
+
+/* Light-mode overrides */
+@media (prefers-color-scheme: light) {
+  .modal-container {
+    background-color: var(--color-surface, #fff);
+    box-shadow:
+      0 4px 6px rgba(0,0,0,0.06),
+      0 24px 64px rgba(0,0,0,0.18);
+  }
+
+  .form-control {
+    background-color: var(--color-surface-2, #f0f0f4);
+    color: var(--color-text, #0e0e14);
+  }
+
+  .form-control:focus {
+    background-color: var(--color-accent-soft, rgba(22,163,74,0.08));
+    border-color: var(--color-accent, #16a34a);
+  }
+
+  .modal-default-button {
+    background-color: var(--color-surface-2, #f0f0f4);
+    color: var(--color-text, #0e0e14);
+  }
+
+  .modal-default-button:hover {
+    background-color: var(--color-surface-3, #e6e6ec);
+    border-color: var(--color-accent, #16a34a);
+    color: var(--color-accent, #16a34a);
+  }
+}
