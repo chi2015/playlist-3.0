@@ -178,7 +178,9 @@ export function App() {
           .then(setPlaylistData)
           .finally(() => setLoading(false));
       } else {
-        setTop100Year((y) => (isNext ? y + 1 : y - 1));
+        const minYear = yearsArray[yearsArray.length - 1];
+        const maxYear = yearsArray[0];
+        setTop100Year((y) => Math.min(maxYear, Math.max(minYear, isNext ? y + 1 : y - 1)));
       }
     },
     [actualDate, setPlaylistData],
