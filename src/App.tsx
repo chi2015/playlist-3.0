@@ -58,7 +58,16 @@ export function App() {
 
   // --- helpers -----------------------------------------------------------
   const addToStorage = useCallback((date: string, list: Item[]) => {
-    setStorage((prev) => ({ ...prev, [date]: decorateList(list, date, prev) }));
+    setStorage((prev) => {
+      const updated = { ...prev, [date]: decorateList(list, date, prev) };
+      // If the following week's playlist is already cached, re-decorate it now
+      // that we have its prev-week data available.
+      const following = nextDate(date);
+      if (updated[following]) {
+        updated[following] = decorateList(updated[following], following, updated);
+      }
+      return updated;
+    });
   }, []);
 
   const setPlaylistData = useCallback(
@@ -72,16 +81,33 @@ export function App() {
 
   // Watcher equivalent: when actualDate changes, fetch if not cached.
   useEffect(() => {
-    if (storageRef.current[actualDate]) return;
     let cancelled = false;
+
+    const fetchPrevIfMissing = (resolvedDate: string) => {
+      if (storageRef.current[prevDate(resolvedDate)]) return;
+      remote('prev', { pl_date: resolvedDate }).then((data) => {
+        if (!cancelled && data.date && data.list) {
+          addToStorage(data.date.substring(0, 10), data.list as Item[]);
+        }
+        // silently ignore errors — missing prev playlist is not an error state
+      });
+    };
+
+    if (storageRef.current[actualDate]) {
+      fetchPrevIfMissing(actualDate);
+      return () => { cancelled = true; };
+    }
+
     setLoading(true);
     remote('current', { current_date: actualDate })
       .then((data) => {
         if (cancelled) return;
-        if (data.date) setActualDate(data.date.substring(0, 10));
-        if (data.date && data.list) addToStorage(data.date.substring(0, 10), data.list as Item[]);
-        setCurrentDate((prev) => prev ?? (data.date ? data.date.substring(0, 10) : actualDate));
+        const resolvedDate = data.date ? data.date.substring(0, 10) : actualDate;
+        if (data.date) setActualDate(resolvedDate);
+        if (data.date && data.list) addToStorage(resolvedDate, data.list as Item[]);
+        setCurrentDate((prev) => prev ?? resolvedDate);
         if (data.error) setErrorTxt(data.error);
+        fetchPrevIfMissing(resolvedDate);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
