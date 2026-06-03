@@ -16,8 +16,6 @@ const yearsArray: number[] = (() => {
   return arr;
 })();
 
-const isMobileNow = () => window.innerWidth < 800;
-
 export function App() {
   // --- core data ---------------------------------------------------------
   const [actualDate, setActualDate] = useState<string>(today);
@@ -32,8 +30,7 @@ export function App() {
   // --- ui state ----------------------------------------------------------
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>('main');
-  const [isMobile, setIsMobile] = useState<boolean>(isMobileNow);
-  const [showLeftMenu, setShowLeftMenu] = useState<boolean>(() => !isMobileNow());
+  const [isLatest, setIsLatest] = useState(false);
   const [errorTxt, setErrorTxt] = useState<string | false>(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [dragover, setDragover] = useState(false);
@@ -133,7 +130,6 @@ export function App() {
 
   // --- navigation methods -----------------------------------------------
   const current = useCallback(() => {
-    setShowLeftMenu(!isMobile);
     setMode('main');
     if (currentDate && storageRef.current[currentDate]) {
       setActualDate(currentDate);
@@ -146,10 +142,9 @@ export function App() {
         if (data.date) setCurrentDate(data.date.substring(0, 10));
       })
       .finally(() => setLoading(false));
-  }, [currentDate, isMobile, setPlaylistData]);
+  }, [currentDate, setPlaylistData]);
 
   const latest = useCallback(() => {
-    setShowLeftMenu(!isMobile);
     setMode('main');
     if (latestDate && storageRef.current[latestDate]) {
       setActualDate(latestDate);
@@ -162,7 +157,13 @@ export function App() {
         if (data.date) setLatestDate(data.date.substring(0, 10));
       })
       .finally(() => setLoading(false));
-  }, [latestDate, isMobile, setPlaylistData]);
+  }, [latestDate, setPlaylistData]);
+
+  const handleLatestToggle = useCallback((checked: boolean) => {
+    setIsLatest(checked);
+    if (checked) latest();
+    else current();
+  }, [latest, current]);
 
   const nextprev = useCallback(
     (isNext: boolean) => {
@@ -192,7 +193,6 @@ export function App() {
 
   const move = useCallback(
     (direction: 'left' | 'right') => {
-      setShowLeftMenu((prev) => prev && !isMobile);
       const el = contentRef.current;
       if (!el) return;
       const cls = 'move' + direction;
@@ -202,7 +202,7 @@ export function App() {
         nextprev(direction === 'right');
       }, 300);
     },
-    [isMobile, nextprev],
+    [nextprev],
   );
 
   moveRef.current = move;
@@ -262,9 +262,8 @@ export function App() {
   uploadFileRef.current = uploadFile;
 
   const openfile = useCallback(() => {
-    setShowLeftMenu((prev) => prev && !isMobile);
     fileInputRef.current?.click();
-  }, [isMobile]);
+  }, []);
 
   const changefile = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,10 +274,9 @@ export function App() {
   );
 
   const handleDownloadPDF = useCallback(() => {
-    setShowLeftMenu((prev) => prev && !isMobile);
     const list = storage[actualDate];
     if (list) downloadPDF(actualDate, list);
-  }, [actualDate, isMobile, storage]);
+  }, [actualDate, storage]);
 
   const deletePlaylist = useCallback((plDate: string, password: string) => {
     setLoading(true);
@@ -314,14 +312,7 @@ export function App() {
       .finally(() => setLoading(false));
   }, [latest]);
 
-  // --- side effects: resize, drag/drop, touch ----------------------------
-  useEffect(() => {
-    const handleResize = () => setIsMobile(isMobileNow());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Drag-and-drop on body (port of initDragAndDropEvents).
+  // --- side effects: drag/drop, touch ------------------------------------
   useEffect(() => {
     const body = document.body;
     const events = ['dragenter', 'dragover', 'dragleave', 'drop'] as const;
@@ -408,47 +399,27 @@ export function App() {
     <div className="main-block" id="playlist-app">
       <div className="header-title">Playlist</div>
       <div className="header">
-        <div
-          className="main-menu menu-item"
-          onClick={() => setShowLeftMenu((s) => !s)}
-        />
-        {showLeftMenu && (
-          <div className="left-menu">
-            <div className="lm-item menu-item" onClick={latest}>Latest</div>
-            <div className="lm-item menu-item" onClick={current}>Current</div>
-            <div className="lm-item menu-item" onClick={openfile}>Add</div>
-            <div className="lm-item menu-item" onClick={handleDownloadPDF}>Download</div>
-            <div
-              className="lm-item menu-item"
-              onClick={() => {
-                setShowLeftMenu(!isMobile);
-                setMode('top100');
-              }}
-            >
-              Top 100
-            </div>
-            <div
-              className="lm-item menu-item"
-              onClick={() => {
-                setShowLeftMenu(!isMobile);
-                setMode('top10artists');
-              }}
-            >
-              Top 10 Artists
-            </div>
-            <div
-              className="lm-item menu-item delete-menu-item"
-              onClick={() => {
-                setShowLeftMenu(!isMobile);
-                setConfirmDelete(true);
-              }}
-            >
-              Delete
-            </div>
-          </div>
-        )}
+
+        <label className="pl-latest menu-item">
+          <input
+            type="checkbox"
+            checked={isLatest}
+            onChange={(e) => handleLatestToggle(e.target.checked)}
+          />
+          <span>Latest</span>
+        </label>
+
         <div className="date-block">
           <div className="pl-prev menu-item" onClick={() => move('left')} />
+          <select
+            className="pl-mode"
+            value={mode}
+            onChange={(e) => setMode(e.target.value as Mode)}
+          >
+            <option value="main">Playlist</option>
+            <option value="top100">Top 100</option>
+            <option value="top10artists">Top 10</option>
+          </select>
           {mode === 'main' && (
             <input
               type="date"
@@ -473,10 +444,13 @@ export function App() {
           )}
           <div className="pl-next menu-item" onClick={() => move('right')} />
         </div>
+
         <div className="updown-items">
           <div className="pl-upload menu-item" title="Add playlist" onClick={openfile} />
           <div className="pl-download menu-item" title="Download PDF" onClick={handleDownloadPDF} />
+          <div className="pl-delete menu-item" title="Delete playlist" onClick={() => setConfirmDelete(true)} />
         </div>
+
       </div>
 
       <div
