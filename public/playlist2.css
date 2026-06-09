@@ -258,6 +258,8 @@ body {
    ============================================================ */
 
 .pl-latest {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -319,6 +321,8 @@ body {
    ============================================================ */
 
 .date-block {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -403,6 +407,8 @@ input.pl_date::-webkit-calendar-picker-indicator {
    ============================================================ */
 
 .updown-items {
+  grid-column: 3;
+  grid-row: 1;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1052,7 +1058,6 @@ input.pl_date::-webkit-calendar-picker-indicator {
 /* ---- Touch / narrow mobile ---- */
 @media (max-width: 639px) {
   .main-menu {
-    /* 44×44 touch target minimum */
     min-width: 44px;
     min-height: 44px;
   }
