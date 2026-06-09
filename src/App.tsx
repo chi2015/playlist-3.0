@@ -193,6 +193,7 @@ export function App() {
 
   const nextprev = useCallback(
     (isNext: boolean) => {
+      setIsLatest(false);
       const m = modeRef.current;
       if (m === 'main') {
         const target = isNext ? nextDate(actualDate) : prevDate(actualDate);
@@ -426,21 +427,23 @@ export function App() {
       <div className="header-title">Playlist</div>
       <div className="header">
 
-        <label className="pl-latest menu-item">
-          <input
-            type="checkbox"
-            checked={isLatest}
-            onChange={(e) => handleLatestToggle(e.target.checked)}
-          />
-          <span>Latest</span>
-        </label>
+        {mode === 'main' && (
+          <label className="pl-latest menu-item">
+            <input
+              type="checkbox"
+              checked={isLatest}
+              onChange={(e) => handleLatestToggle(e.target.checked)}
+            />
+            <span>Latest</span>
+          </label>
+        )}
 
         <div className="date-block">
           <div className="pl-prev menu-item" onClick={() => move('left')} />
           <select
             className="pl-mode"
             value={mode}
-            onChange={(e) => setMode(e.target.value as Mode)}
+            onChange={(e) => { setIsLatest(false); setMode(e.target.value as Mode); }}
           >
             <option value="main">Playlist</option>
             <option value="top100">Top 100</option>
@@ -452,7 +455,7 @@ export function App() {
               id="calendar-date"
               className="pl_date"
               value={actualDate}
-              onChange={(e) => setActualDate(e.target.value)}
+              onChange={(e) => { setIsLatest(false); setActualDate(e.target.value); }}
             />
           )}
           {(mode === 'top100' || mode === 'top10artists') && (
