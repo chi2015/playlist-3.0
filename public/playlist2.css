@@ -237,7 +237,7 @@ body {
   top: 0;
   z-index: var(--z-sticky);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto auto 1fr;
   align-items: stretch;
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
@@ -321,7 +321,7 @@ body {
    ============================================================ */
 
 .date-block {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   display: flex;
   align-items: center;
@@ -351,6 +351,9 @@ input.pl_date,
 }
 
 select.pl-mode {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
   background-color: var(--color-surface-2);
   color: var(--color-text);
   border: 1px solid var(--color-border-strong);
@@ -407,7 +410,7 @@ input.pl_date::-webkit-calendar-picker-indicator {
    ============================================================ */
 
 .updown-items {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1;
   display: flex;
   flex-direction: row;
@@ -1062,11 +1065,41 @@ input.pl_date::-webkit-calendar-picker-indicator {
     min-height: 44px;
   }
 
+  /* 2-row header: row 1 = Latest | mode | icons; row 2 = date/year */
+  .header {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: 48px 44px;
+    height: auto;
+  }
+
+  .pl-latest {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  select.pl-mode {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .updown-items {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .date-block {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    border-top: 1px solid var(--color-border);
+    padding: 0 var(--space-sm);
+  }
+
   input.pl_date,
   #pl_year {
-    min-width: 120px;
+    flex: 1;
+    min-width: 0;
     font-size: var(--fs-body);
-    height: 44px;
+    height: 36px;
   }
 
   .pl-upload,
