@@ -438,17 +438,18 @@ export function App() {
           </label>
         )}
 
+        <select
+          className="pl-mode"
+          value={mode}
+          onChange={(e) => { setIsLatest(false); setMode(e.target.value as Mode); }}
+        >
+          <option value="main">Playlist</option>
+          <option value="top100">Top 100</option>
+          <option value="top10artists">Top 10</option>
+        </select>
+
         <div className="date-block">
           <div className="pl-prev menu-item" onClick={() => move('left')} />
-          <select
-            className="pl-mode"
-            value={mode}
-            onChange={(e) => { setIsLatest(false); setMode(e.target.value as Mode); }}
-          >
-            <option value="main">Playlist</option>
-            <option value="top100">Top 100</option>
-            <option value="top10artists">Top 10</option>
-          </select>
           {mode === 'main' && (
             <input
               type="date"
