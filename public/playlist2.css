@@ -1034,6 +1034,10 @@ input.pl_date::-webkit-calendar-picker-indicator {
     height: 64px;
   }
 
+  select.pl-mode {
+    margin-right: var(--space-xs);
+  }
+
   .item-info {
     width: 68px;
     min-height: 64px;
